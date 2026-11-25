@@ -1,45 +1,54 @@
-# Two-node openSAFETY demonstrator
+# Two-endpoint openSAFETY frame exchange
 
-This is the integration project for turning the protocol stack into runnable
-software nodes. It is kept separate from `src/eplssrc/` so the upstream stack
-and its original paths remain intact.
+This proof uses the actual openSAFETY 1.4 frame serializer and deserializer
+from `src/eplssrc/SN/`. The stack source remains in its upstream paths; this
+example adds the application edge and a replaceable SHNF transport boundary.
 
-## Current status
+## What currently works
 
-- The upstream SN and SCM C sources compile as the `opensafety_stack` static
-  library with the 32-bit MinGW toolchain.
-- A runnable node still needs its SHNF transmit/receive adapter, application
-  callbacks, a configured Safety Object Dictionary, and a cyclic main loop.
-- No two-node communication is claimed yet. The next milestone is a local
-  transport proof of SPDO exchange; MQTT is deliberately postponed.
+The executable creates two logical endpoints in one process and exchanges two
+SNMT frames through a loopback SHNF adapter:
 
-The 32-bit target is intentional. This legacy 1.4 stack stores pointers in
-32-bit fields in some configurations, so a 64-bit build is not a valid runtime
-target even if the compiler can produce a library.
+1. Endpoint A serializes an SNMT request to set endpoint B to PRE-OPERATIONAL.
+2. Endpoint B receives and validates the frame, including its paired subframes
+   and CRC, then serializes a PRE-OPERATIONAL SNMT response.
+3. Endpoint A receives and validates the response.
 
-## Integration layout
+Both frames are built and parsed by the upstream `SFS_FrmSerialize` and
+`SFS_FrmDeSerialize` functions. The adapter also accounts for the upstream
+stack's transmit-buffer subframe order. This proves that the protocol frame
+format and SHNF boundary can be used for a two-endpoint exchange.
 
-The planned separation is:
+This is a frame-level proof. It does not initialize the full SN state machine
+with `SSC_InitAll`, run an SCM cycle, access a configured SOD, or move data
+between two independently running processes. The PRE-OPERATIONAL command is
+decoded as a valid SNMT frame but is not applied to a running node. Those are
+the next integration steps before calling the endpoints fully operational
+openSAFETY nodes. The current loopback adapter is deliberately isolated so it
+can be replaced by UDP and later by MQTT.
 
-```text
-examples/two-nodes/
-  app/          node and manager application entry points, callbacks, SOD
-  transport/    replaceable SHNF transport adapter
-  config/       per-node protocol and object-dictionary configuration
-```
+## Build and run on Windows
 
-The first transport will be local UDP/loopback for easy observation. The
-protocol frames and SHNF boundary will remain independent of UDP so a later
-MQTT transport can be evaluated without rewriting the openSAFETY application.
-
-## Stack library build
-
-From the repository root, with CMake and a 32-bit MinGW GCC toolchain installed:
+Use a 32-bit MinGW GCC toolchain. This legacy stack stores pointers in 32-bit
+fields in some configurations, so the 64-bit target is not suitable.
 
 ```powershell
 cmake -S . -B build -G "MinGW Makefiles" `
-  -DCMAKE_C_COMPILER=C:/toolchains/mingw32/bin/gcc.exe
-cmake --build build --target opensafety_stack
+  -DCMAKE_C_COMPILER=C:/toolchains/mingw32/bin/gcc.exe `
+  -DOPENSAFETY_BUILD_FRAME_EXCHANGE=ON
+cmake --build build --target opensafety-frame-exchange
+./build/examples/two-nodes/opensafety-frame-exchange.exe
 ```
 
-This builds the protocol library only; it does not create runnable nodes yet.
+Expected output includes a valid SNMT request from endpoint A to B and a valid
+PRE-OPERATIONAL response from B to A.
+
+## Layout
+
+```text
+examples/two-nodes/
+  frame_exchange.c   frame-level exchange entry point
+  loopback_shnf.c    SHNF memory, loopback queue, CRC adapters
+  link_stubs.c       no-SOD callbacks required for the codec-only executable
+  CMakeLists.txt     optional demo target
+```

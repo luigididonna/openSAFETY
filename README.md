@@ -3,7 +3,7 @@ openSAFETY Distribution Version 1.4
 
 ## This fork: development entry point
 
-This fork adds a clearer development entry point for building a portable openSAFETY proof of concept. The current completed milestone is a reusable 32-bit stack-library build. Two software Safety Nodes exchanging frames is the next integration milestone; MQTT comes after that.
+This fork adds a clearer development entry point for building a portable openSAFETY proof of concept. The completed milestones are a reusable 32-bit stack-library build and a frame-level SNMT request/response exchanged by two stack endpoints. Running independently initialized Safety Nodes is the next integration milestone; MQTT comes after that.
 
 The upstream source tree is kept in its original locations because its headers and generated configuration rely on those paths. New application and transport code belongs under `examples/`, while the protocol stack remains under `src/eplssrc/`.
 

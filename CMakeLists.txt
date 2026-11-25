@@ -48,7 +48,16 @@ target_include_directories(opensafety_stack PUBLIC
 
 target_compile_features(opensafety_stack PUBLIC c_std_99)
 
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(opensafety_stack PRIVATE -ffunction-sections -fdata-sections)
+endif()
+
 if(WIN32)
     target_compile_definitions(opensafety_stack PUBLIC _WIN32_WINNT=0x0601)
+endif()
+
+option(OPENSAFETY_BUILD_FRAME_EXCHANGE "Build a two-endpoint openSAFETY frame codec demo" OFF)
+if(OPENSAFETY_BUILD_FRAME_EXCHANGE)
+    add_subdirectory(examples/two-nodes)
 endif()
 
