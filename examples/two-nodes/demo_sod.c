@@ -236,7 +236,7 @@ static UINT8 ab_0_act_2000[k_CRC_OBJECTS_LENGTH] SAFE_NO_INIT_SEKTOR;
    |  1   |  2  |        3    | 4  |  5   |      6          |         7         |        8      |         9               |
    {0x1400, 0x01, {RW | BEF_WR, U16, 0x2UL, &w_0_def_1400_01},  &w_0_act_1400_01, &s_rg_w_0_1023, SPDO_RxCommPara_SOD_CLBK},
 */
-SOD_cfg_TO_RAM_ROM SOD_t_OBJECT SAPL_s_OD_INST_0[]=
+SOD_cfg_TO_RAM_ROM SOD_t_OBJECT demo_sod_producer_od[]=
 {
   /* Error Register */
   {0x1001U, 0x00U, {RO, U8, 0x1UL, NULL}, &b_0_act_1001_00, NULL, SOD_k_NO_CALLBACK},
@@ -288,30 +288,11 @@ SOD_cfg_TO_RAM_ROM SOD_t_OBJECT SAPL_s_OD_INST_0[]=
   {0x1400U, 0x0BU, {RW   , U32, 0x4UL, &dw_0_def_1400_0B}, &dw_0_act_1400_0B, NULL             , SOD_k_NO_CALLBACK},
   {0x1400U, 0x0CU, {RW   , U16, 0x2UL,  &w_0_def_1400_0C},  &w_0_act_1400_0C, aw_rg_1_1023     , SOD_k_NO_CALLBACK},
 
-  /* 0x1400-0x17FE RxSPDO Communication Parameter */
-  {0x1401U, 0x00U, {CONST, U8 , 0x1UL, &b_noE_12        }, &b_noE_12        , NULL             , SOD_k_NO_CALLBACK},
-  {0x1401U, 0x01U, {RW   , U16, 0x2UL,  &w_0_def_1401_01},  &w_0_act_1401_01, aw_rg_0_1023     , SOD_k_NO_CALLBACK},
-  {0x1401U, 0x02U, {RW   , U32, 0x4UL,  &w_0_def_1401_02},  &w_0_act_1401_02, NULL			    , SOD_k_NO_CALLBACK},
-  {0x1401U, 0x03U, {RW   , U8 , 0x1UL,  &b_0_def_1401_03},  &b_0_act_1401_03, ab_rg_1_63       , SOD_k_NO_CALLBACK},
-  {0x1401U, 0x04U, {RW   , U32, 0x4UL, &dw_0_def_1401_04}, &dw_0_act_1401_04, NULL             , SOD_k_NO_CALLBACK},
-  {0x1401U, 0x05U, {RW   , U32, 0x4UL, &dw_0_def_1401_05}, &dw_0_act_1401_05, NULL             , SOD_k_NO_CALLBACK},
-  {0x1401U, 0x06U, {RW   , U16, 0x2UL,  &w_0_def_1401_06},  &w_0_act_1401_06, &PROP_DELAY_RANGE, SOD_k_NO_CALLBACK},
-  {0x1401U, 0x07U, {RW   , U16, 0x2UL,  &w_0_def_1401_07},  &w_0_act_1401_07, aw_rg_1_65535    , SOD_k_NO_CALLBACK},
-  {0x1401U, 0x08U, {RW   , U16, 0x2UL,  &w_0_def_1401_08},  &w_0_act_1401_08, &PROP_DELAY_RANGE, SOD_k_NO_CALLBACK},
-  {0x1401U, 0x09U, {RW   , U16, 0x2UL,  &w_0_def_1401_09},  &w_0_act_1401_09, aw_rg_1_65535    , SOD_k_NO_CALLBACK},
-  {0x1401U, 0x0AU, {RW   , U16, 0x2UL,  &w_0_def_1401_0A},  &w_0_act_1401_0A, aw_rg_0_65535    , SOD_k_NO_CALLBACK},
-  {0x1401U, 0x0BU, {RW   , U32, 0x4UL, &dw_0_def_1401_0B}, &dw_0_act_1401_0B, NULL             , SOD_k_NO_CALLBACK},
-  {0x1401U, 0x0CU, {RW   , U16, 0x2UL,  &w_0_def_1401_0C},  &w_0_act_1401_0C, aw_rg_1_1023     , SOD_k_NO_CALLBACK},
-
 #if (SPDO_cfg_MAX_NO_RX_SPDO != 0)
   /* 0x1800-0x1BFE RxSPDO Mapping Parameter */
   {0x1800U, 0x00U, {RW|BEF_WR, U8 , 0x1UL,   &b_0_def_1800_00   },   &b_0_act_1800_00   , ab_rg_0_253, SPDO_SOD_RxMappPara_CLBK},
   {0x1800U, 0x01U, {RW|BEF_WR, U32, 0x4UL, &adw_0_def_1800_01[0]}, &adw_0_act_1800_01[0], NULL       , SPDO_SOD_RxMappPara_CLBK},
   //{0x1800U, 0x02U, {RW|BEF_WR, U32, 0x4UL, &adw_0_def_1800_01[1]}, &adw_0_act_1800_01[1], NULL       , SPDO_SOD_RxMappPara_CLBK},
-
-  /* 0x1800-0x1BFE RxSPDO Mapping Parameter */
-  {0x1801U, 0x00U, {RW|BEF_WR, U8 , 0x1UL,   &b_0_def_1801_00   },   &b_0_act_1801_00   , ab_rg_0_253, SPDO_SOD_RxMappPara_CLBK},
-  {0x1801U, 0x01U, {RW|BEF_WR, U32, 0x4UL, &adw_0_def_1801_01[0]}, &adw_0_act_1801_01[0], NULL       , SPDO_SOD_RxMappPara_CLBK},
 #endif
 
   /* TxSPDO Communication Parameter */
@@ -319,12 +300,6 @@ SOD_cfg_TO_RAM_ROM SOD_t_OBJECT SAPL_s_OD_INST_0[]=
   {0x1C00U, 0x01U, {RW   , U16, 0x2UL, &w_0_def_1C00_01}, &w_0_act_1C00_01, aw_rg_0_1023 , SOD_k_NO_CALLBACK},
   {0x1C00U, 0x02U, {RW   , U16, 0x2UL, &w_0_def_1C00_02}, &w_0_act_1C00_02, aw_rg_1_32767, SOD_k_NO_CALLBACK},
   {0x1C00U, 0x03U, {RW   , U8 , 0x1UL, &b_0_def_1C00_03}, &b_0_act_1C00_03, NULL         , SOD_k_NO_CALLBACK},
-
-  /* TxSPDO Communication Parameter */
-  {0x1C01U, 0x00U, {CONST, U8 , 0x1UL, &b_noE_3        }, &b_noE_3        , NULL         , SOD_k_NO_CALLBACK},
-  {0x1C01U, 0x01U, {RW   , U16, 0x2UL, &w_0_def_1C01_01}, &w_0_act_1C01_01, aw_rg_0_1023 , SOD_k_NO_CALLBACK},
-  {0x1C01U, 0x02U, {RW   , U16, 0x2UL, &w_0_def_1C01_02}, &w_0_act_1C01_02, aw_rg_1_32767, SOD_k_NO_CALLBACK},
-  {0x1C01U, 0x03U, {RW   , U8 , 0x1UL, &b_0_def_1C01_03}, &b_0_act_1C01_03, NULL         , SOD_k_NO_CALLBACK},
 
   /* CRC objects */
   {0x2000U, 0x01U, {RW | CRC, U8, 0x1UL, NULL}, &ab_0_act_2000[0], NULL , SOD_k_NO_CALLBACK},
@@ -338,54 +313,16 @@ SOD_cfg_TO_RAM_ROM SOD_t_OBJECT SAPL_s_OD_INST_0[]=
   {0xC000U, 0x01U, {RW|BEF_WR, U32, 0x4UL, &adw_0_def_C000_01[0]}, &adw_0_act_C000_01[0], NULL       , SPDO_SOD_TxMappPara_CLBK},
   //{0xC000U, 0x02U, {RW|BEF_WR, U32, 0x4UL, &adw_0_def_C000_01[1]}, &adw_0_act_C000_01[1], NULL       , SPDO_SOD_TxMappPara_CLBK},
 
-  /* 0xC000-0xC3FE TxSPDO Mapping Parameter */
-  {0xC001U, 0x00U, {RW|BEF_WR, U8 , 0x1UL,   &b_0_def_C001_00   },   &b_0_act_C001_00   , ab_rg_0_253, SPDO_SOD_TxMappPara_CLBK},
-  {0xC001U, 0x01U, {RW|BEF_WR, U32, 0x4UL, &adw_0_def_C001_01[0]}, &adw_0_act_C001_01[0], NULL       , SPDO_SOD_TxMappPara_CLBK},
-
   /* end of SOD */
   {SOD_k_END_OF_THE_OD, 0xFFU, {0U, EPLS_k_BOOLEAN, 0x1UL, NULL}, NULL, NULL, SOD_k_NO_CALLBACK}
 };
 
 /** \endcond */
 
-/* global structure for all object dictionaries */
-const SOD_cfg_TO_RAM_ROM const SOD_t_OBJECT * const SAPL_ps_OD[EPLS_cfg_MAX_INSTANCES]=
-{
-  SAPL_s_OD_INST_0
-  #if (EPLS_cfg_MAX_INSTANCES > 1)
-    ,SAPL_s_OD_INST_0
-  #endif
-  #if (EPLS_cfg_MAX_INSTANCES > 2)
-    ,SAPL_s_OD_INST_0
-  #endif
-  #if (EPLS_cfg_MAX_INSTANCES > 3)
-    ,SAPL_s_OD_INST_0
-  #endif
-  #if (EPLS_cfg_MAX_INSTANCES > 4)
-    ,SAPL_s_OD_INST_0
-  #endif
-  #if (EPLS_cfg_MAX_INSTANCES > 5)
-    ,SAPL_s_OD_INST_0
-  #endif
-  #if (EPLS_cfg_MAX_INSTANCES > 6)
-    ,SAPL_s_OD_INST_0
-  #endif
-  #if (EPLS_cfg_MAX_INSTANCES > 7)
-    ,SAPL_s_OD_INST_0
-  #endif
-  #if (EPLS_cfg_MAX_INSTANCES > 8)
-    ,SAPL_s_OD_INST_0
-  #endif
-  #if (EPLS_cfg_MAX_INSTANCES > 9)
-    ,SAPL_s_OD_INST_0
-  #endif
-  #if (EPLS_cfg_MAX_INSTANCES > 10)
-    ,SAPL_s_OD_INST_0
-  #endif
-};
+void demo_sod_producer_set_value(UINT8 value) { ab_0_act_ProcessData[1] = value; }
 
-UINT8 demo_sod_get_rx_value(void) { return ab_0_act_ProcessData[0]; }
-void demo_sod_set_tx_value(UINT8 value) { ab_0_act_ProcessData[1] = value; }
+
+
 
 
 

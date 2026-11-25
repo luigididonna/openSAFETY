@@ -1,21 +1,23 @@
-# Two-endpoint openSAFETY SPDO frame exchange
+# Two-node openSAFETY SPDO exchange
 
 This demonstrator initializes the upstream openSAFETY 1.4 stack (`SSC_InitAll`)
-and sends one data-only SPDO frame from logical producer SADR 1 to consumer
-SADR 4 through a replaceable SHNF loopback adapter.
+and runs two logical Safety Nodes through a loopback SHNF transport. The
+producer uses SADR 1, the consumer receives SADR 1, and their Safety Object
+Dictionaries have role-specific reciprocal SPDO communication settings.
 
-The frame uses the stack's `SFS_GetMemBlock`, `SFS_FrmSerialize`, and
-`SFS_FrmDeSerialize` APIs. The receiver validates the paired subframes,
-addresses, frame type, data byte, and CRC before reporting success. The
-demonstration is self-contained in one process, so the loopback adapter can
-later be replaced by a network transport.
+The producer maps object `0x6000/2` into a Tx SPDO. The consumer maps that
+payload into `0x6000/1`. The executable activates both mappings, starts the
+SPDO state machines, cycles frames in both directions for the stack's time
+synchronization, and calls `SPDO_ProcessRxSpdo` and `SPDO_CheckRxTimeout` on
+received frames. It verifies the consumer's mapped byte and Rx connection
+status through the stack API.
 
-This proves the exchange and integrity validation of an actual openSAFETY
-SPDO-format frame. It does not yet demonstrate two independently operational
-Safety Nodes: the application still bypasses the SNMT/SCM state transition and
-the `SPDO_ProcessRxSpdo` object-mapping path. That next step requires separate,
-role-specific producer and consumer SOD configurations. MQTT integration comes
-after that; MQTT transports the frame and does not replace openSAFETY validation.
+This proves a mapped process-data exchange through the real SPDO stack path,
+including frame serialization, subframe and CRC validation, time
+synchronization, and receiver mapping. For this focused demo the application
+calls `SPDO_SetToOp` directly; the SNMT/SCM node activation lifecycle is not
+simulated. MQTT integration is a later transport change and must preserve the
+complete openSAFETY frame bytes.
 
 The optional demo config disables the SCM because the two endpoints here are
 Safety Nodes. The upstream stack's ordinary configuration is otherwise kept.
@@ -33,16 +35,20 @@ cmake --build build --target opensafety-spdo-exchange
 ./build/examples/two-nodes/opensafety-spdo-exchange.exe
 ```
 
-Expected output confirms a 13-byte SPDO frame and the received data byte
-`0x5A`.
+Expected output confirms the consumer received `0x5A` at `0x6000/1` and that
+the stack reports a valid Rx connection.
 
 ## Layout
 
 ```text
 examples/two-nodes/
   spdo_exchange.c          SPDO frame exchange entry point
-  demo_sod.c               demo object dictionary used by SSC_InitAll
+  demo_sod.c               producer SOD and 0x6000/2 Tx mapping
+  demo_sod_consumer.c      consumer SOD and 0x6000/1 Rx mapping
+  demo_sod_index.c         binds role-specific SODs to stack instances
+  demo_sod_config.h        shared endpoint addresses and role selection
   demo_sod_spdo_config.h   SPDO communication and mapping parameters
+  demo_sod_app.h           demo application and parameter-set definitions
   node-only-config/        stack config override with SCM disabled
   loopback_shnf.c          SHNF memory, loopback queue, CRC adapters
   link_stubs.c             application callbacks for the demo build

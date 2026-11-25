@@ -1,70 +1,104 @@
 #include <stdio.h>
-#include <string.h>
 #include "EPLScfg.h"
 #include "EPLStarget.h"
 #include "EPLStypes.h"
 #include "SSCapi.h"
-#include "SHNF.h"
-#include "SFS.h"
+#include "SODapi.h"
+#include "SPDOapi.h"
+#include "SPDO.h"
 #include "loopback_shnf.h"
+
+void demo_sod_producer_set_value(UINT8 value);
+UINT8 demo_sod_consumer_get_value(void);
+
+static BOOLEAN activate_rx(UINT8 instance)
+{
+    BOOLEAN busy;
+    do {
+        busy = FALSE;
+        if (!SPDO_ActivateRxSpdoMapping(instance, &busy)) return FALSE;
+    } while (busy);
+    return TRUE;
+}
+
+static BOOLEAN activate_tx(UINT8 instance)
+{
+    BOOLEAN busy;
+    do {
+        busy = FALSE;
+        if (!SPDO_ActivateTxSpdoMapping(instance, &busy)) return FALSE;
+    } while (busy);
+    return TRUE;
+}
+
+static BOOLEAN exchange_one_tick(UINT8 source, UINT8 destination, UINT32 ct)
+{
+    UINT8 free_frames = 1u;
+    UINT8 frame[600];
+    UINT16 frame_length = 0u;
+
+    SPDO_BuildTxSpdo(source, ct, &free_frames);
+    if (free_frames != 0u) return TRUE;
+    if (!loopback_take_tx(source, frame, &frame_length) ||
+        !loopback_deliver(destination, frame, frame_length) ||
+        !loopback_take_rx(destination, frame, &frame_length)) return FALSE;
+
+    SPDO_ProcessRxSpdo(destination, ct, frame, frame_length);
+    SPDO_CheckRxTimeout(destination, ct);
+    return TRUE;
+}
 
 int main(void)
 {
     const UINT8 producer = 0u;
     const UINT8 consumer = 1u;
-    const UINT8 process_value = 0x5Au;
-    UINT8 free_frames = 1u;
-    UINT8 wire_frame[600];
-    UINT8 received_frame[600];
-    UINT16 wire_length = 0u;
-    UINT16 received_length = 0u;
-    UINT8 *tx;
-    const UINT8 *payload;
-    EPLS_t_FRM_HDR tx_header;
-    EPLS_t_FRM_HDR rx_header;
+    const UINT8 value_sent = 0x5Au;
+    UINT16 ticks = 0u;
+    UINT16 delta_ct = 0u;
+    UINT16 propagation_delay = 0u;
+    UINT32 data_age = 0u;
+    BOOLEAN rx_valid;
 
     if (!SSC_InitAll()) {
         fputs("SSC_InitAll failed; see the openSAFETY stack error above.\n", stderr);
         return 1;
     }
 
-    memset(&tx_header, 0, sizeof(tx_header));
-    tx_header.w_adr = 1u;
-    tx_header.b_id = 0x30u; /* SPDO data only frame (no time request/response). */
-    tx_header.w_sdn = 1u;
-    tx_header.b_le = 1u;
-    tx_header.w_ct = 1u;
-    tx_header.w_tadr = 4u;
-
-    tx = SFS_GetMemBlock(producer, SHNF_k_SPDO, 0u, tx_header.b_le);
-    if (tx == NULL) {
-        fputs("SPDO producer could not allocate a frame.\n", stderr);
+    SPDO_ActivateStart(producer);
+    SPDO_ActivateStart(consumer);
+    if (!activate_tx(producer) || !activate_tx(consumer) ||
+        !activate_rx(producer) || !activate_rx(consumer)) {
+        fputs("The stack rejected an SPDO communication or mapping parameter.\n", stderr);
         return 2;
     }
-    tx[SFS_k_FRM_DATA_OFFSET] = process_value;
-    if (!SFS_FrmSerialize(producer, &tx_header, tx) ||
-        !loopback_take_tx(producer, wire_frame, &wire_length) ||
-        !loopback_deliver(consumer, wire_frame, wire_length) ||
-        !loopback_take_rx(consumer, received_frame, &received_length)) {
-        fputs("SPDO serialization or loopback delivery failed.\n", stderr);
-        return 3;
-    }
 
-    memset(&rx_header, 0, sizeof(rx_header));
-    payload = SFS_FrmDeSerialize(consumer, received_frame, received_length,
-                                 &rx_header);
-    if (payload == NULL || rx_header.b_id != 0x30u ||
-        rx_header.w_adr != tx_header.w_adr ||
-        rx_header.w_tadr != tx_header.w_tadr || payload[0] != process_value) {
-        fputs("Consumer rejected the SPDO frame or mapped payload.\n", stderr);
+    SPDO_SetToOp(producer, 0u);
+    SPDO_SetToOp(consumer, 0u);
+    demo_sod_producer_set_value(value_sent);
+    SPDO_TxDataChanged(producer, 1u);
+    for (ticks = 1u; ticks <= 100u; ++ticks) {
+        UINT32 ct = (UINT32)ticks * 100u;
+        if (!exchange_one_tick(producer, consumer, ct) ||
+            !exchange_one_tick(consumer, producer, ct + 1u)) {
+            fputs("Loopback transport failed while exchanging SPDO frames.\n", stderr);
+            return 3;
+        }
+        if (demo_sod_consumer_get_value() == value_sent) break;
+    }
+    rx_valid = SPDO_GetRxSpdoStatus(consumer, 0u, (UINT32)ticks * 100u,
+                                    &delta_ct, &data_age, &propagation_delay);
+    if (demo_sod_consumer_get_value() != value_sent || !rx_valid) {
+        fprintf(stderr, "Mapped value mismatch: sent 0x%02X, received 0x%02X.\n",
+                value_sent, demo_sod_consumer_get_value());
         return 4;
     }
 
-    printf("openSAFETY SPDO frame exchange succeeded\n");
-    printf("  producer SADR: %u -> consumer SADR: %u\n",
-           rx_header.w_adr, rx_header.w_tadr);
-    printf("  frame length: %u bytes; verified process-data byte: 0x%02X\n",
-           received_length, payload[0]);
-    printf("  upstream SFS serializer and decoder verified both frame subframes and CRC\n");
+    printf("openSAFETY SPDO producer/consumer exchange succeeded\n");
+    printf("  producer SADR 1 -> consumer instance %u (Rx SPDO from SADR 1)\n",
+           consumer);
+    printf("  exchange completed in %u cyclic opportunities\n", ticks);
+    printf("  SOD 0x6000/1 received 0x%02X; Rx connection status is valid\n",
+           demo_sod_consumer_get_value());
+    printf("  stack APIs exercised: SPDO_BuildTxSpdo, SPDO_ProcessRxSpdo, SPDO_CheckRxTimeout\n");
     return 0;
 }

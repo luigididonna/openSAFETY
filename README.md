@@ -3,7 +3,7 @@ openSAFETY Distribution Version 1.4
 
 ## This fork: development entry point
 
-This fork adds a clearer development entry point for building a portable openSAFETY proof of concept. The completed milestones are a reusable 32-bit stack-library build and a frame-level SNMT request/response exchanged by two stack endpoints. Running independently initialized Safety Nodes is the next integration milestone; MQTT comes after that.
+This fork adds a clearer development entry point for building a portable openSAFETY proof of concept. The current demonstrator initializes the stack and exchanges mapped SPDO process data between two logical endpoints through the upstream stack APIs and loopback transport. Independent SNMT/SCM activation and network transport integration remain later steps.
 
 The upstream source tree is kept in its original locations because its headers and generated configuration rely on those paths. New application and transport code belongs under `examples/`, while the protocol stack remains under `src/eplssrc/`.
 
@@ -14,7 +14,7 @@ The upstream source tree is kept in its original locations because its headers a
 - `src/eplssrc/contrib/` — platform and protocol configuration, including the SHNF transport boundary.
 - `cmake/` and `src/CMakeLists.txt` — the upstream build and source-check infrastructure.
 - `doc/` — upstream protocol and integration documentation.
-- `examples/two-nodes/` — status, layout, and implementation plan for the two-node demonstrator.
+- `examples/two-nodes/` - two-node SPDO producer/consumer demo, role-specific SODs, loopback SHNF transport, build instructions, and integration notes.
 
 The upstream distribution does not provide a ready-made transport adapter or a runnable two-node application. This fork adds those integration pieces incrementally. This source is for a demonstrator; the upstream README below documents the limitations for safety-certified products.
 

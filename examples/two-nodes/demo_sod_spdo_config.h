@@ -85,7 +85,7 @@
 #define SAPL_k_SPDO_RX_COMM_PARA_DEF  static \
 /* 1 RX SPDO */\
        UINT16  w_0_act_1400_01 SAFE_NO_INIT_SEKTOR; /* SADR */ \
-static UINT16  w_0_def_1400_01 SAFE_INIT_SEKTOR = SAPL_k_SN2_ADD_SADR_1;\
+static UINT16  w_0_def_1400_01 SAFE_INIT_SEKTOR = DEMO_SPDO_RX_SOURCE_SADR;\
 static UINT32  w_0_act_1400_02 SAFE_NO_INIT_SEKTOR; /* SCT */ \
 static UINT32  w_0_def_1400_02 SAFE_INIT_SEKTOR = 32000U;\
 static UINT8   b_0_act_1400_03 SAFE_NO_INIT_SEKTOR; /* Number of consecutive TReq */\
@@ -155,7 +155,7 @@ static UINT32 adw_0_def_1801_01[SAPL_k_NO_RX_SPDO_MAPP_ENTRIES] SAFE_INIT_SEKTOR
 #define SAPL_k_SPDO_TX_COMM_PARA_DEF static\
 /* 1 TX SPDO */\
        UINT16 w_0_act_1C00_01 SAFE_NO_INIT_SEKTOR; /* Tx SPDO SADR */\
-static UINT16 w_0_def_1C00_01 SAFE_INIT_SEKTOR = SAPL_k_SN2_ADD_SADR_1;\
+static UINT16 w_0_def_1C00_01 SAFE_INIT_SEKTOR = DEMO_SPDO_TX_SOURCE_SADR;\
 static UINT16 w_0_act_1C00_02 SAFE_NO_INIT_SEKTOR; /* Refresh prescale */\
 static UINT16 w_0_def_1C00_02 SAFE_INIT_SEKTOR = 1000U; /*original 1000 */\
 static UINT8  b_0_act_1C00_03 SAFE_NO_INIT_SEKTOR; /* Number of TRes */\

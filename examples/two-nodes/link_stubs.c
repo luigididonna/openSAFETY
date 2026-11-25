@@ -87,23 +87,31 @@ SOD_t_ABORT_CODES SAPL_SOD_ActualLenGet(BYTE_B_INSTNUM_ UINT32 handle,
     return SOD_ABT_OBJ_DOES_NOT_EXIST;
 }
 
-BOOLEAN SAPL_SOD_ParameterSet_CLBK(BYTE_B_INSTNUM_ SOD_t_SERVICE service, const SOD_t_OBJECT *object, const void *data, UINT32 offset, UINT32 size, SOD_t_ABORT_CODES *error)
+BOOLEAN SAPL_SOD_ParameterSet_CLBK(BYTE_B_INSTNUM_ SOD_t_SERVICE service,
+                                   const SOD_t_OBJECT *object,
+                                   const void *data, UINT32 offset,
+                                   UINT32 size, SOD_t_ABORT_CODES *error)
 {
-    (void)b_instNum; (void)service; (void)object; (void)data; (void)offset; (void)size;
+    (void)b_instNum;
+    (void)service;
+    (void)object;
+    (void)data;
+    (void)offset;
+    (void)size;
     *error = SOD_ABT_UNSUPPORTED_ACCESS;
-    return TRUE;
+    return FALSE;
 }
 
-
-
-#include "SCMapi.h"
-#include "SNMTSapi.h"
-void SAPL_ScmUdidMismatchClbk(UINT16 sadr, const UINT8 *udid, UINT16 handle) {(void)sadr;(void)udid;(void)handle;}
-void SAPL_ScmSnFailClbk(UINT16 sadr, UINT8 group, UINT8 code, UINT16 handle) {(void)sadr;(void)group;(void)code;(void)handle;}
-void SAPL_ScmNodeStatusChangedClbk(UINT16 sadr, UINT8 old_status, UINT8 new_status) {(void)sadr;(void)old_status;(void)new_status;}
-BOOLEAN SAPL_ScmRevisionNumberClbk(UINT16 sadr, UINT32 expected, UINT32 received) {(void)sadr;(void)expected;return expected==received;}
-BOOLEAN SAPL_ScmProcessSn(UINT16 sadr) {(void)sadr;return TRUE;}
-void SAPL_SNMTS_CalcParamChkSumClbk(BYTE_B_INSTNUM) {(void)b_instNum;}
-void SAPL_SNMTS_SwitchToOpReqClbk(BYTE_B_INSTNUM) {(void)b_instNum;}
-void SAPL_SNMTS_ErrorAckClbk(BYTE_B_INSTNUM_ UINT8 group, UINT8 code) {(void)b_instNum;(void)group;(void)code;}
-BOOLEAN SAPL_SNMTS_ParameterSetProcessed(BYTE_B_INSTNUM) {(void)b_instNum;return TRUE;}
+void SAPL_SNMTS_CalcParamChkSumClbk(BYTE_B_INSTNUM) { (void)b_instNum; }
+void SAPL_SNMTS_SwitchToOpReqClbk(BYTE_B_INSTNUM) { (void)b_instNum; }
+void SAPL_SNMTS_ErrorAckClbk(BYTE_B_INSTNUM_ UINT8 group, UINT8 code)
+{
+    (void)b_instNum;
+    (void)group;
+    (void)code;
+}
+BOOLEAN SAPL_SNMTS_ParameterSetProcessed(BYTE_B_INSTNUM)
+{
+    (void)b_instNum;
+    return TRUE;
+}

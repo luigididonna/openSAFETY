@@ -1,6 +1,8 @@
 add_executable(opensafety-spdo-exchange
     spdo_exchange.c
     demo_sod.c
+    demo_sod_consumer.c
+    demo_sod_index.c
     loopback_shnf.c
     link_stubs.c)
 
