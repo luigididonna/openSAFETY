@@ -1,6 +1,23 @@
 openSAFETY Distribution Version 1.4 
 ===================================
 
+## This fork: development entry point
+
+This fork adds a clearer development entry point for building a portable openSAFETY proof of concept. The current completed milestone is a reusable 32-bit stack-library build. Two software Safety Nodes exchanging frames is the next integration milestone; MQTT comes after that.
+
+The upstream source tree is kept in its original locations because its headers and generated configuration rely on those paths. New application and transport code belongs under `examples/`, while the protocol stack remains under `src/eplssrc/`.
+
+### Repository map
+
+- `src/eplssrc/SN/` — openSAFETY Safety Node stack.
+- `src/eplssrc/SCM/` — Safety Configuration Manager stack.
+- `src/eplssrc/contrib/` — platform and protocol configuration, including the SHNF transport boundary.
+- `cmake/` and `src/CMakeLists.txt` — the upstream build and source-check infrastructure.
+- `doc/` — upstream protocol and integration documentation.
+- `examples/two-nodes/` — status, layout, and implementation plan for the two-node demonstrator.
+
+The upstream distribution does not provide a ready-made transport adapter or a runnable two-node application. This fork adds those integration pieces incrementally. This source is for a demonstrator; the upstream README below documents the limitations for safety-certified products.
+
 General Information
 --------------------
 
