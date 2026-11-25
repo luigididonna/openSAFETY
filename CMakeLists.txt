@@ -56,8 +56,9 @@ if(WIN32)
     target_compile_definitions(opensafety_stack PUBLIC _WIN32_WINNT=0x0601)
 endif()
 
-option(OPENSAFETY_BUILD_FRAME_EXCHANGE "Build a two-endpoint openSAFETY frame codec demo" OFF)
+option(OPENSAFETY_BUILD_FRAME_EXCHANGE "Build the two-endpoint openSAFETY SPDO frame demo" OFF)
 if(OPENSAFETY_BUILD_FRAME_EXCHANGE)
+    target_include_directories(opensafety_stack BEFORE PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/examples/two-nodes/node-only-config")
     add_subdirectory(examples/two-nodes)
 endif()
-
